@@ -1,20 +1,68 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { MaterialIcons } from "@expo/vector-icons";
+import Constants from 'expo-constants'
+
+import TouchScreen from "./src/screens/TouchScreen.js";
+import PinScreen from "./src/screens/PinScreen.js";
+import HomeScreen from "./src/screens/HomeScreen.js";
+import SendRequestScreen from "./src/screens/SendRequestScreen.js";
+import CardScreen from "./src/screens/CardScreen.js";
+import ChartScreen from './src/screens/ChartScreen'
+import TableScreen from "./src/screens/TableScreen.js";
+import { StatusBar } from "expo-status-bar";
 
 export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
+  const AppStack = createStackNavigator();
+  const TabStack = createBottomTabNavigator()
+  screenOptions = ({ route }) => ({
+    headerShown: false,
+    tabBarStyle: {
+      backgroundColor: "#1e1e1e",
+      borderTopColor: "1e1e1e",
+      paddingBottom: 10,
+      height: 55
+    },
+    tabBarIcon: ({ focused }) => {
+      let icon = "";
+      const color = focused ? "#5750f0" : "#828282"
+      const size = 24
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+      switch (route.name) {
+        case "Charts":
+          icon = "stacked-bar-chart";
+          break;
+        case "Tables":
+          icon = "table-view";
+          break;
+        default:
+          icon = "dashboard"
+      }
+      return <MaterialIcons name={icon} size={size} color={color} />
+    },
+    tabBarActiveTintColor: "#5750f0"
+  })
+  const TabStackScreen = () => {
+    return (
+      <TabStack.Navigator screenOptions={screenOptions} >
+        <TabStack.Screen name="Home" component={HomeScreen} />
+        <TabStack.Screen name="Tables" component={TableScreen} options={{ title: "Tablas" }} />
+        <TabStack.Screen name="Charts" component={ChartScreen} options={{ title: "Gráficas" }} />
+      </TabStack.Navigator>
+    )
+  }
+
+  return (
+    <>
+      <NavigationContainer>
+        <AppStack.Navigator headerShown={false} screenOptions={{ headerShown: false,cardStyle:{marginTop:Constants.statusBarHeight} }} >
+          <AppStack.Screen name="Tabs" component={TabStackScreen} />
+          <AppStack.Screen name="Touch" component={TouchScreen} />
+          <AppStack.Screen name="Pin" component={PinScreen} />
+        </AppStack.Navigator>
+      </NavigationContainer>
+      <StatusBar backgroundColor="#1e1e1e" style="light" />
+    </>
+  )
+}

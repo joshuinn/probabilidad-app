@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Bank",
-    "slug": "Bank",
+    "name": "probabilidad-app",
+    "slug": "probabilidad-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
