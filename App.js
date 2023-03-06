@@ -21,7 +21,6 @@ export default function App() {
       borderTopColor: "1e1e1e",
       paddingBottom: 10,
       height: 55,
-      
     },
     tabBarIcon: ({ focused }) => {
       let icon = "";
@@ -40,11 +39,11 @@ export default function App() {
       }
       return <MaterialIcons name={icon} size={size} color={color} />
     },
-    tabBarActiveTintColor: "#5750f0"
+    tabBarActiveTintColor: "#5750f0",
   })
   const TabStackScreen = () => {
     return (
-      <TabStack.Navigator screenOptions={screenOptions} >
+      <TabStack.Navigator screenOptions={screenOptions}>
         <TabStack.Screen name="Home" component={HomeScreen} />
         <TabStack.Screen name="Tables" component={Table} options={{ title: "Tabla" }} />
         <TabStack.Screen name="Charts" component={ChartScreen} options={{ title: "Gráficas" }} />
@@ -55,13 +54,17 @@ export default function App() {
   return (
     <>
       <NavigationContainer>
-        <AppStack.Navigator headerShown={false} screenOptions={{ headerShown: false, cardStyle: { marginTop: Constants.statusBarHeight } }} >
+        <AppStack.Navigator headerShown={false} screenOptions={{
+          headerShown: false,
+          cardStyle: {
+          }
+        }} >
           <AppStack.Screen name="Tabs" component={TabStackScreen} />
           <AppStack.Screen name="Touch" component={TouchScreen} />
           <AppStack.Screen name="Pin" component={PinScreen} />
         </AppStack.Navigator>
       </NavigationContainer>
-      <StatusBar backgroundColor="#1e1e1e" style="light" />
+      <StatusBar style="light" />
     </>
   )
 }
