@@ -13,7 +13,7 @@ export default HomeScreen = () => {
     return (
       <CardContainer>
         <CardTitle>
-          <Text center large bold style={{ backgroundColor: item.color }}>{item.title}</Text>
+          <Text style={{ color: "#fff", backgroundColor: item.titlebgColor, padding: 10, borderRadius: 10 }} >{item.title}</Text>
           <MaterialIcons name={item.icon} size={24} color={item.colorItem} />
         </CardTitle>
         <CardInfo>
@@ -28,7 +28,11 @@ export default HomeScreen = () => {
       <CogContainer>
         <FontAwesome5 name="cog" size={24} color="#727479" />
       </CogContainer>
-      <Text center title heavy margin_custom="0">Conceptos</Text>
+      <SearchContainer>
+        <AntDesign name="search1" size={18} color="#5196f4" />
+        <Search placeholder="Buscar dato" />
+      </SearchContainer>
+      <Text center title heavy>Conceptos</Text>
       <Cards data={concepts} renderItem={renderConcept} />
     </Container>
   )
@@ -60,4 +64,23 @@ const CardInfo = styled.View`
 const CogContainer = styled.View`
   align-items:flex-end;
   margin:10px 10px 0 0;
+`;
+
+const SearchContainer = styled.View`
+  background-color:#3d3d3d;
+  flex-direction:row;
+  justify-content:center;
+  align-items:center;
+  padding:0 8px;
+  border-radius:6px
+  margin:16px 0 10px 10px;
+  width:70%;
+`;
+
+const Search = styled.TextInput`
+  flex:1;
+  padding:8px 16px;
+  color:#dbdbdb;
+  width:80%;
+  
 `;

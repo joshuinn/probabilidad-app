@@ -1,10 +1,65 @@
-import React from "react";
-import styled from "styled-components/native";
+import { Text, StyleSheet } from "react-native";
+
 export default TextStyle = ({ ...props }) => {
-    return <Text {...props}>{props.children}</Text>
+    const styled = [
+        styles.text,
+        props.center && styles.center,
+        props.title && styles.title,
+        props.large && styles.large,
+        props.medium && styles.medium,
+        props.small && styles.small,
+        props.light && styles.light,
+        props.bold && styles.bold,
+        props.heavy && styles.heavy,
+        props.black && styles.black,
+        { color: props.color ?? "#dbdbdb" }
+    ]
+    return (
+        <Text
+            style={styled}
+            {...props}
+        >
+            {props.children}
+        </Text>
+    )
 }
 
-const Text = styled.Text`
+const styles = StyleSheet.create({
+    text: {
+        color: "#fff",
+        fontSize: 13,
+        fontWeight: 400,
+    },
+    center: {
+        textAlign: 'center'
+    },
+    title: {
+        fontSize: 32
+    },
+    large: {
+        fontSize: 18
+    },
+    medium: {
+        fontSize: 15
+    },
+    light: {
+        fontWeight: "200"
+    },
+    bold: {
+        fontWeight: "600"
+    },
+    heavy: {
+        fontWeight: "700"
+    },
+    black: {
+        fontWeight: "900"
+    },
+
+
+})
+
+
+/*const Text = styled.Text`
     color:${(props) => props.color ?? "#DBDBDB"};
     margin:${(props) =>  props.margin_custom ?? 0};
     padding:${(props) => props.padding_custom ?? 0};
@@ -49,3 +104,4 @@ const Text = styled.Text`
         }
     }}
 `
+*/

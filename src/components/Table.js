@@ -1,129 +1,244 @@
-import React, { useEffect, useState } from 'react'
-import styled from 'styled-components/native'
-import { Container } from '../../theme'
-import { AntDesign } from '@expo/vector-icons';
-
-import Text from './Text'
-import NumberPad from './NumberPad';
+import React, { memo, useEffect, useState } from 'react'
+import { View, StyleSheet, SafeAreaView, Pressable } from 'react-native'
+import { ScrollView } from 'react-native-gesture-handler'
 import { BackHandler } from 'react-native';
+import Text from './Text'
+import NumberPad from './NumberPad'
+import * as operations from './operations'
 
 const ModalKeyBoard = ({ onPress }) => {
     return (
-        <KeyBoardContainer>
+        <View style={styles.keyboard}>
             <NumberPad onPress={onPress} />
-        </KeyBoardContainer>
+        </View>
     )
 }
+const getKeyboardPressed = (prev, index, item) => {
+    if (index != 10) {
 
+        let newNumber = prev + item;
+        if (parseInt(newNumber) == 0) {
+            return "0"
+        }
+        if (prev[0] == "0") {
+            return item;
+        }
+        return newNumber;
+    }
+    else {
+        if (prev.length - 1 <= 0) {
+            return "0";
+        }
+        return prev.slice(0, prev.length - 1)
+    }
+}
 
-export default Table = ({navigation}) => {
-    const [dataTable, setDataTable] = useState([])
-    const [numberOfRows, setNumberOfRows] = useState("0")
-    const [isDisplayedKeyboard, setIsDisplayedKeyboard] = useState(false)
+const RenderTable =
+    memo(({ data, setIsDisplayedKeyboard, whoItemPressed, setWhoItemPressed, isDisplayedKeyboard }) => {
+        let getFA = operations.getAcumulateFrecuency(data[1]);
+        let getFR = operations.getRelativeFrecuency(getFA[getFA.length - 1], data[1]);
+        const RenderData = memo(({ item, index }) => {
+            return (
+                <Pressable style={styles.row} onLongPress={() => {
+                    console.log("pressed!");
+                }} delayPressIn={500}>
+                    <Pressable
+                        style={[styles.column,
+                        { backgroundColor: whoItemPressed[0] ? (whoItemPressed[1] === index ? "#303030" : null) : "transparent" }]}
+                        onPress={() => {
+                            setWhoItemPressed([true, index])
+                            setIsDisplayedKeyboard([true, "modData"])
+                        }
+                        }
+                    >
+                        <Text>{item}
+                        </Text>
+                    </Pressable>
+                    <Pressable
+                        style={[styles.column,
+                        { backgroundColor: !whoItemPressed[0] ? (whoItemPressed[1] === index ? "#515151" : null) : "transparent" }]}
+                        onPress={() => {
+                            setWhoItemPressed([false, index])
+                            setIsDisplayedKeyboard([true, "modData"])
+                        }
+                        }
+                    >
+                        <Text>{data[1][index]}</Text></Pressable>
+                    <View style={styles.column}><Text>{getFA[index]}</Text></View>
+                    <View style={styles.column}><Text>{getFR[index]}</Text></View>
+                </Pressable>
+            )
+        })
+        return (
+            <ScrollView style={{ flex: 1, marginBottom: isDisplayedKeyboard[0] ? 300 : 0 }}>
+                {data[0].map((item, index) => {
+                    return <RenderData key={index} item={item} index={index} />
+                })}
+            </ScrollView>
+        )
+    })
 
+export default Table = ({ navigation }) => {
+    const [dataTable, setDataTable] = useState([[], []])
+    const [dataInput, setDataInput] = useState("0");
+    const [frecuencyInput, setFrecuencyInput] = useState("0")
+    const [isDisplayedKeyboard, setIsDisplayedKeyboard] = useState([false, "who"])
+    const [whoItemPressed, setWhoItemPressed] = useState([false, "index"]);
     useEffect(() => {
         BackHandler.addEventListener('hardwareBackPress', () => {
-            if (isDisplayedKeyboard) {
-                setIsDisplayedKeyboard(false);
+            if (isDisplayedKeyboard[0]) {
+                setIsDisplayedKeyboard([false, "who"]);
+                setWhoItemPressed([false, false]);
                 return true;
             }
             return false;
         })
     })
     const handleKeyBoard = (item, index) => {
-        setNumberOfRows(prev => {
-            if (index != 10) {
-                let newNumber = prev + item;
-                if (parseInt(newNumber) == 0) {
-                    return "0"
+        switch (isDisplayedKeyboard[1]) {
+            case "setF":
+                setFrecuencyInput(prev => {
+                    return getKeyboardPressed(prev, index, item)
+                })
+                return
+            case "setData":
+                setDataInput(prev => {
+                    return getKeyboardPressed(prev, index, item)
+                })
+                return
+            case "modData":
+                let NewArray
+                if (whoItemPressed[0]) {
+                    NewArray = dataTable[0].map((data, i) => {
+                        if (i === whoItemPressed[1]) {
+                            return getKeyboardPressed(data.toString(), index, item)
+                        }
+                        return data
+                    })
+                    setDataTable([NewArray, [...dataTable[1]]])
+                } else {
+                    NewArray = dataTable[1].map((data, i) => {
+                        if (i === whoItemPressed[1]) {
+                            return getKeyboardPressed(data.toString(), index, item)
+                        }
+                        return data
+                    })
+                    setDataTable([[...dataTable[0]], NewArray])
                 }
-                if (prev[0] == "0") {
-                    return item;
-                }
-                return newNumber;
-            }
-            else {
-                if (prev.length - 1 === 0) {
-                    return "0";
-                }
-                return prev.slice(0, prev.length - 1)
-            }
-            return index != 10 ? prev + item :
-                (prev.slice(0, prev.length - 1))
-        });
-    }
-
-    if (!dataTable.length > 0) {
-        return (
-            <Container>
-                <EmptyTitle>
-                    <Text center large heavy>Parece que aún no hay tablas</Text>
-                    <AntDesign name="table" size={24} color="white" />
-                </EmptyTitle>
-                <GetRowsContainer>
-                    <Text>Establecer valor:</Text>
-                    <InputRows onPress={() => { setIsDisplayedKeyboard(!isDisplayedKeyboard) }}>
-                        <Text>
-                            {numberOfRows}
-                        </Text>
-                    </InputRows>
-                    {
-                        parseInt(numberOfRows) > 0 &&
-                        <GeterateTableButton>
-                            <Text>Generar tabla</Text>
-                        </GeterateTableButton>
-                    }
-                </GetRowsContainer>
-                {isDisplayedKeyboard ? (
-                    <ModalKeyBoard onPress={handleKeyBoard} />
-                ) : null}
-            </Container>
-        )
+                return;
+        }
     }
     return (
-        <Container>
-            <TableContainer data={dataTable}>
-                <Text>Table</Text>
-            </TableContainer>
-        </Container>
+        <SafeAreaView style={styles.container}>
+            <Text center title black>Tabla</Text>
+            <View style={styles.getDataContainer}>
+                <View>
+                    <Text center>Ingresa N. del dato: </Text>
+                    <Pressable
+                        style={[styles.inputdata,
+                        { backgroundColor: isDisplayedKeyboard[1] === "setData" ? '#303030' : "#515151" }]}
+                        onPress={() => {
+                            setIsDisplayedKeyboard([true, "setData"])
+                            setWhoItemPressed([false, false])
+                        }}
+                    >
+                        <Text center heavy>{dataInput}</Text>
+                    </Pressable>
+                </View>
+                <View>
+                    <Text center>Su frecuencia</Text>
+                    <Pressable
+                        style={[styles.inputdata,
+                        { backgroundColor: isDisplayedKeyboard[1] === "setF" ? '#303030' : "#515151" }]}
+                        onPress={() => {
+                            setIsDisplayedKeyboard([true, "setF"])
+                            setWhoItemPressed([false, false])
+                        }}
+                    >
+                        <Text center heavy>{frecuencyInput}</Text>
+                    </Pressable>
+                </View>
+                <View>
+                    <Pressable style={styles.button} onPress={() => {
+                        setDataTable([[...dataTable[0], parseInt(dataInput)],
+                        [...dataTable[1], parseInt(frecuencyInput)]])
+                        setDataInput("0")
+                        setFrecuencyInput("0")
+                    }}>
+                        <Text>Agregar</Text>
+                    </Pressable>
+                </View>
+            </View>
+            <View style={styles.table}>
+                <View style={styles.row}>
+                    <View style={styles.column} ><Text center heavy large>Dato</Text></View>
+                    <View style={styles.column}><Text center heavy large>Frecuecia Absoluta</Text></View>
+                    <View style={styles.column}><Text center heavy medium>Frecuecia Absoluta acumulada</Text></View>
+                    <View style={styles.column}><Text center heavy large>Frecuecia relativa</Text></View>
+                </View>
+                {
+                    <RenderTable
+                        data={dataTable}
+                        setIsDisplayedKeyboard={setIsDisplayedKeyboard}
+                        whoItemPressed={whoItemPressed}
+                        setWhoItemPressed={setWhoItemPressed}
+                        isDisplayedKeyboard={isDisplayedKeyboard}
+                    />
+                }
+            </View>
+            {
+                isDisplayedKeyboard[0] ? (
+                    <ModalKeyBoard onPress={handleKeyBoard} />
+                ) : null
+            }
+        </SafeAreaView >
     )
 }
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#1e1e1e',
+        paddingTop: 32
+    },
+    column: {
+        borderColor: "#000",
+        borderWidth: 1,
+        width: "25%",
+        justifyContent: 'center',
+        padding: 5
+    },
+    row: {
+        flexDirection: "row"
+    },
+    inputdata: {
+        backgroundColor: "#515151",
+        padding: 10,
+        width: 120,
+        borderRadius: 10,
+    },
+    button: {
+        width: 100,
+        backgroundColor: "#5750f0",
+        justifyContent: "center",
+        alignItems: 'center',
+        borderRadius: 15,
+        padding: 10
+    },
+    keyboard: {
+        position: "absolute",
+        backgroundColor: '#242424',
+        bottom: 0
+    },
+    getDataContainer: {
+        flexDirection: "row",
+        gap: 10,
+        alignItems: 'center',
+        padding: 10
+    },
+    table: {
+        flex: 1,
+        alignItems: "center",
+    }
+})
 
-const TableContainer = styled.FlatList`
 
-`;
-const KeyBoardContainer = styled.View`
-    position:absolute;
-    bottom:0;
-    background:#242424;
-    padding:10px;
-`;
-const EmptyTitle = styled.View`
-    flex-direction:row;
-    justify-content:center;
-    gap:20px;
-    padding:10px 0;
-`;
-
-const InputRows = styled.Pressable`
-    width:20%;
-    padding:10px;
-    background-color:#515151;
-    border-radius:15px;
-    justify-content:center;
-    align-items:center;
-`;
-
-const GetRowsContainer = styled.View`
-    flex-direction:row;
-    align-items:center;
-    justify-content:space-evenly;
-    margin:10px;
-`;
-
-const GeterateTableButton = styled.TouchableOpacity`
-    background-color:#5750f0;
-    width:100px;
-    padding:10px;
-    border-radius:10px;
-`;

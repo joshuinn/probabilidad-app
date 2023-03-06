@@ -27,13 +27,12 @@ export default HomeScreen = () => {
       <Header>
         <ProfilePhoto source={require("../../assets/profile.png")} />
         <Welcome>
-          <Text heavy medium>Welcome,</Text>
-          <Text>DesignIntoCode</Text>
+          <Text heavy medium>Gráfica</Text>
         </Welcome>
         <FontAwesome5 name="cog" size={24} color="#565656" />
       </Header>
-      <Text center title black>$9,184.17</Text>
-      <Text center heavy color="#727479">Current Balance</Text>
+      <Text center title black>Gráfica 1</Text>
+      <Text center heavy color="#727479">subtitilo</Text>
 
       <Chart>
         <LineChart
@@ -55,8 +54,6 @@ export default HomeScreen = () => {
           }}
           width={Dimensions.get('window').width - 16}
           height={220}
-          yAxisLabel="$"
-          yAxisSuffix='k'
           chartConfig={{
             backgroundColor: '#1cc910',
             backgroundGradientFrom: '#1e1e1e',
@@ -74,14 +71,14 @@ export default HomeScreen = () => {
       <Purchases ListHeaderComponent={
         <>
           <TransactionsHeader>
-            <Text>Last Purchases</Text>
+            <Text>Ultimos subidos</Text>
             <MaterialIcons name="sort" sise={24} color="#5196f4" />
 
           </TransactionsHeader>
 
           <SearchContainer>
             <AntDesign name="search1" size={18} color="#5196f4" />
-            <Search placeholder="Seach Transactions" />
+            <Search placeholder="Buscar dato" />
           </SearchContainer>
         </>
       }

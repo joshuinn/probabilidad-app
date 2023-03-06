@@ -4,3 +4,5 @@ export const Container = styled.SafeAreaView`
     flex:1;
     background-color:#1e1e1e;
 `;
+
+export const View = styled.View``;

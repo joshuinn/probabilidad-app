@@ -7,11 +7,9 @@ import Constants from 'expo-constants'
 import TouchScreen from "./src/screens/TouchScreen.js";
 import PinScreen from "./src/screens/PinScreen.js";
 import HomeScreen from "./src/screens/HomeScreen.js";
-import SendRequestScreen from "./src/screens/SendRequestScreen.js";
-import CardScreen from "./src/screens/CardScreen.js";
 import ChartScreen from './src/screens/ChartScreen'
-import TableScreen from "./src/screens/TableScreen.js";
 import { StatusBar } from "expo-status-bar";
+import Table from './src/components/Table'
 
 export default function App() {
   const AppStack = createStackNavigator();
@@ -22,7 +20,8 @@ export default function App() {
       backgroundColor: "#1e1e1e",
       borderTopColor: "1e1e1e",
       paddingBottom: 10,
-      height: 55
+      height: 55,
+      
     },
     tabBarIcon: ({ focused }) => {
       let icon = "";
@@ -47,7 +46,7 @@ export default function App() {
     return (
       <TabStack.Navigator screenOptions={screenOptions} >
         <TabStack.Screen name="Home" component={HomeScreen} />
-        <TabStack.Screen name="Tables" component={TableScreen} options={{ title: "Tablas" }} />
+        <TabStack.Screen name="Tables" component={Table} options={{ title: "Tabla" }} />
         <TabStack.Screen name="Charts" component={ChartScreen} options={{ title: "Gráficas" }} />
       </TabStack.Navigator>
     )
@@ -56,7 +55,7 @@ export default function App() {
   return (
     <>
       <NavigationContainer>
-        <AppStack.Navigator headerShown={false} screenOptions={{ headerShown: false,cardStyle:{marginTop:Constants.statusBarHeight} }} >
+        <AppStack.Navigator headerShown={false} screenOptions={{ headerShown: false, cardStyle: { marginTop: Constants.statusBarHeight } }} >
           <AppStack.Screen name="Tabs" component={TabStackScreen} />
           <AppStack.Screen name="Touch" component={TouchScreen} />
           <AppStack.Screen name="Pin" component={PinScreen} />
