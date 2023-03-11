@@ -1,10 +1,7 @@
 import React from 'react'
-import { Dimensions } from 'react-native'
 import styled from 'styled-components/native'
 import { FontAwesome5, MaterialIcons, AntDesign } from '@expo/vector-icons'
-import { LineChart, } from 'react-native-chart-kit'
 
-import { Container } from '../../theme'
 import concepts from '../../concepts'
 import Text from '../components/Text'
 
@@ -28,15 +25,36 @@ export default HomeScreen = () => {
       <CogContainer>
         <FontAwesome5 name="cog" size={24} color="#727479" />
       </CogContainer>
-      <SearchContainer>
+      <Autors>
+        <LeftPadd>
+          <Text black medium>En desarrollo por: </Text>
+        </LeftPadd>
+        <First>
+          <Text black>Del Monte Ortega Joshua Alexander</Text>
+        </First>
+        <Second>
+          <Text black>Duran Medina Erick Alejandro</Text>
+        </Second>
+      </Autors>
+      <LeftPadd>
+        <Text black>Grupo: 5CV21</Text>
+      </LeftPadd>
+      {/*
+        <SearchContainer>
         <AntDesign name="search1" size={18} color="#5196f4" />
         <Search placeholder="Buscar dato" />
-      </SearchContainer>
+      </SearchContainer>*/
+      }
       <Text center title heavy>Conceptos</Text>
       <Cards data={concepts} renderItem={renderConcept} />
     </Container>
   )
 }
+export const Container = styled.SafeAreaView`
+    flex:1;
+    background-color:#1e1e1e;
+    padding-top:32px;
+`
 
 const Cards = styled.FlatList`
   padding:0 8px;
@@ -82,5 +100,26 @@ const Search = styled.TextInput`
   padding:8px 16px;
   color:#dbdbdb;
   width:80%;
-  
 `;
+const Autors = styled.View`
+  gap:5px;
+`
+const First = styled.View`
+  background-color:#5750f0;
+  width:80%;
+  padding:10px;
+  border-top-right-radius:15px;
+  border-bottom-right-radius:15px;
+`
+const Second = styled.View`
+  align-items:flex-end;
+  width:80%;
+  background-color:#6F3DD9;
+  align-self:flex-end;
+  padding:10px;
+  border-top-left-radius:15px;
+  border-bottom-left-radius:15px;
+`
+const LeftPadd = styled.View`
+  padding:5px;
+`

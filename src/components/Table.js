@@ -1,10 +1,12 @@
 import React, { memo, useEffect, useState } from 'react'
-import { View, StyleSheet, SafeAreaView, Pressable } from 'react-native'
+import { View, StyleSheet, SafeAreaView, Pressable, BackHandler } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
-import { BackHandler } from 'react-native';
+
 import Text from './Text'
-import NumberPad from './NumberPad'
 import * as operations from './operations'
+import NumberPad from './NumberPad'
+import theme from '../../theme'
+//import { GeneralTable } from './TypeTables.js'
 
 const ModalKeyBoard = ({ onPress }) => {
     return (
@@ -32,30 +34,22 @@ const getKeyboardPressed = (prev, index, item) => {
         return prev.slice(0, prev.length - 1)
     }
 }
-
 const RenderTable =
-    memo(({ data, setIsDisplayedKeyboard, whoItemPressed, setWhoItemPressed, isDisplayedKeyboard }) => {
-        let getFA = operations.getAcumulateFrecuency(data[1]);
-        let getFR = operations.getRelativeFrecuency(getFA[getFA.length - 1], data[1]);
+    memo(({ data, setIsDisplayedKeyboard, whoItemPressed, setWhoItemPressed, isDisplayedKeyboard, setDataTable }) => {
+        //let getFA = operations.getAcumulateFrecuency(data[1]);
+        //let getFR = operations.getRelativeFrecuency(getFA[getFA.length - 1], data[1]);
+        ordened = operations.ordenar(data)
+        mediana = operations.getMediana(data)
+        media = operations.getMedia(data)
+        moda = operations.getModa(ordened)
         const RenderData = memo(({ item, index }) => {
             return (
-                <Pressable style={styles.row} onLongPress={() => {
-                    console.log("pressed!");
+                <Pressable style={theme.row} onLongPress={() => {
+                    setDataTable(data.filter((item, i) => {return index != i }))
                 }} delayPressIn={500}>
+                    <View style={theme.column}><Text>{index + 1}</Text></View>
                     <Pressable
-                        style={[styles.column,
-                        { backgroundColor: whoItemPressed[0] ? (whoItemPressed[1] === index ? "#303030" : null) : "transparent" }]}
-                        onPress={() => {
-                            setWhoItemPressed([true, index])
-                            setIsDisplayedKeyboard([true, "modData"])
-                        }
-                        }
-                    >
-                        <Text>{item}
-                        </Text>
-                    </Pressable>
-                    <Pressable
-                        style={[styles.column,
+                        style={[theme.column,
                         { backgroundColor: !whoItemPressed[0] ? (whoItemPressed[1] === index ? "#515151" : null) : "transparent" }]}
                         onPress={() => {
                             setWhoItemPressed([false, index])
@@ -63,25 +57,62 @@ const RenderTable =
                         }
                         }
                     >
-                        <Text>{data[1][index]}</Text></Pressable>
-                    <View style={styles.column}><Text>{getFA[index]}</Text></View>
-                    <View style={styles.column}><Text>{getFR[index]}</Text></View>
+                        <Text>{item}</Text></Pressable>
                 </Pressable>
+            )
+        })
+
+        const OrdenedTable = memo(({ item, index }) => {
+            return (
+                <View style={theme.row}>
+                    <View style={theme.column}><Text>{index + 1}</Text></View>
+                    <View style={theme.column}><Text>{item}</Text></View>
+                    <View style={theme.column}><Text>{ordened.countArr[index]}</Text></View>
+                </View>
             )
         })
         return (
             <ScrollView style={{ flex: 1, marginBottom: isDisplayedKeyboard[0] ? 300 : 0 }}>
-                {data[0].map((item, index) => {
-                    return <RenderData key={index} item={item} index={index} />
-                })}
+                <View style={styles.tableContainer}>
+                    <View style={theme.row}>
+                        <View style={theme.column}><Text center heavy medium>N.</Text></View>
+                        <View style={theme.column} ><Text center heavy medium>Dato</Text></View>
+                    </View>
+                    {data.map((item, index) => {
+                        return <RenderData key={index} item={item} index={index} />
+                    })}
+                </View>
+                <View style={styles.marginTables}>
+                    <Text center heavy large>Tabla organizada</Text>
+                </View>
+                <View style={styles.tableContainer}>
+                    <View style={theme.row}>
+                        <View style={theme.column}><Text center heavy medium>N.</Text></View>
+                        <View style={theme.column}><Text center heavy medium>Dato</Text></View>
+                        <View style={theme.column}><Text center heavy medium>Veces que se repite</Text></View>
+                    </View>
+                    {
+                        ordened.redux.map((item, index) => {
+                            return <OrdenedTable key={index} item={item} index={index} />
+                        })}
+                </View>
+                <View style={styles.results}>
+                    <View style={styles.resultInfo}>
+                        <Text bold medium center>Media: {"\n" + media} </Text>
+                    </View>
+                    <View style={styles.resultInfo}>
+                        <Text bold medium center>Mediana: {"\n" + mediana}</Text>
+                    </View>
+                    <View style={styles.resultInfo}>
+                        <Text bold medium center>Moda: {"\n" + moda}</Text>
+                    </View>
+                </View>
             </ScrollView>
         )
     })
-
-export default Table = ({ navigation }) => {
-    const [dataTable, setDataTable] = useState([[], []])
+export default Table = ({ navigation, headers }) => {
+    const [dataTable, setDataTable] = useState([])
     const [dataInput, setDataInput] = useState("0");
-    const [frecuencyInput, setFrecuencyInput] = useState("0")
     const [isDisplayedKeyboard, setIsDisplayedKeyboard] = useState([false, "who"])
     const [whoItemPressed, setWhoItemPressed] = useState([false, "index"]);
     useEffect(() => {
@@ -96,11 +127,6 @@ export default Table = ({ navigation }) => {
     })
     const handleKeyBoard = (item, index) => {
         switch (isDisplayedKeyboard[1]) {
-            case "setF":
-                setFrecuencyInput(prev => {
-                    return getKeyboardPressed(prev, index, item)
-                })
-                return
             case "setData":
                 setDataInput(prev => {
                     return getKeyboardPressed(prev, index, item)
@@ -109,31 +135,31 @@ export default Table = ({ navigation }) => {
             case "modData":
                 let NewArray
                 if (whoItemPressed[0]) {
-                    NewArray = dataTable[0].map((data, i) => {
+                    NewArray = dataTable.map((data, i) => {
                         if (i === whoItemPressed[1]) {
                             return getKeyboardPressed(data.toString(), index, item)
                         }
                         return data
                     })
-                    setDataTable([NewArray, [...dataTable[1]]])
+                    setDataTable(NewArray)
                 } else {
-                    NewArray = dataTable[1].map((data, i) => {
+                    NewArray = dataTable.map((data, i) => {
                         if (i === whoItemPressed[1]) {
                             return getKeyboardPressed(data.toString(), index, item)
                         }
                         return data
                     })
-                    setDataTable([[...dataTable[0]], NewArray])
+                    setDataTable(NewArray)
                 }
                 return;
         }
     }
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={theme.mainContainer}>
             <Text center title black>Tabla</Text>
             <View style={styles.getDataContainer}>
                 <View>
-                    <Text center>Ingresa N. del dato: </Text>
+                    <Text center>Ingrese el dato: </Text>
                     <Pressable
                         style={[styles.inputdata,
                         { backgroundColor: isDisplayedKeyboard[1] === "setData" ? '#303030' : "#515151" }]}
@@ -146,45 +172,27 @@ export default Table = ({ navigation }) => {
                     </Pressable>
                 </View>
                 <View>
-                    <Text center>Su frecuencia</Text>
-                    <Pressable
-                        style={[styles.inputdata,
-                        { backgroundColor: isDisplayedKeyboard[1] === "setF" ? '#303030' : "#515151" }]}
-                        onPress={() => {
-                            setIsDisplayedKeyboard([true, "setF"])
-                            setWhoItemPressed([false, false])
-                        }}
-                    >
-                        <Text center heavy>{frecuencyInput}</Text>
-                    </Pressable>
-                </View>
-                <View>
                     <Pressable style={styles.button} onPress={() => {
-                        setDataTable([[...dataTable[0], parseInt(dataInput)],
-                        [...dataTable[1], parseInt(frecuencyInput)]])
+                        setDataTable([...dataTable, dataInput])
                         setDataInput("0")
-                        setFrecuencyInput("0")
                     }}>
                         <Text>Agregar</Text>
                     </Pressable>
                 </View>
             </View>
-            <View style={styles.table}>
-                <View style={styles.row}>
-                    <View style={styles.column} ><Text center heavy large>Dato</Text></View>
-                    <View style={styles.column}><Text center heavy large>Frecuecia Absoluta</Text></View>
-                    <View style={styles.column}><Text center heavy medium>Frecuecia Absoluta acumulada</Text></View>
-                    <View style={styles.column}><Text center heavy large>Frecuecia relativa</Text></View>
+            <View style={styles.tableContainer}>
+                <View style={theme.table}>
+                    {
+                        <RenderTable
+                            data={dataTable}
+                            setIsDisplayedKeyboard={setIsDisplayedKeyboard}
+                            whoItemPressed={whoItemPressed}
+                            setWhoItemPressed={setWhoItemPressed}
+                            isDisplayedKeyboard={isDisplayedKeyboard}
+                            setDataTable={setDataTable}
+                        />
+                    }
                 </View>
-                {
-                    <RenderTable
-                        data={dataTable}
-                        setIsDisplayedKeyboard={setIsDisplayedKeyboard}
-                        whoItemPressed={whoItemPressed}
-                        setWhoItemPressed={setWhoItemPressed}
-                        isDisplayedKeyboard={isDisplayedKeyboard}
-                    />
-                }
             </View>
             {
                 isDisplayedKeyboard[0] ? (
@@ -195,21 +203,6 @@ export default Table = ({ navigation }) => {
     )
 }
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#1e1e1e',
-        paddingTop: 32
-    },
-    column: {
-        borderColor: "#000",
-        borderWidth: 1,
-        width: "25%",
-        justifyContent: 'center',
-        padding: 5
-    },
-    row: {
-        flexDirection: "row"
-    },
     inputdata: {
         backgroundColor: "#515151",
         padding: 10,
@@ -222,7 +215,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: 'center',
         borderRadius: 15,
-        padding: 10
+        padding: 10,
     },
     keyboard: {
         position: "absolute",
@@ -232,12 +225,31 @@ const styles = StyleSheet.create({
     getDataContainer: {
         flexDirection: "row",
         gap: 10,
-        alignItems: 'center',
-        padding: 10
+        alignItems: 'flex-end',
+        justifyContent:'center',
+        padding: 15
     },
-    table: {
+    tableContainer: {
         flex: 1,
-        alignItems: "center",
+        width: '100%',
+        height: '100%',
+        alignItems: 'center',
+        justifyContent: "center"
+    },
+    marginTables: {
+        marginVertical: 20
+    },
+    results: {
+        marginVertical: 20,
+        flexDirection: 'row',
+        flexWrap:'wrap',
+        justifyContent: 'space-evenly',
+        gap:15
+    },
+    resultInfo: {
+        backgroundColor: theme.colors.darkPurple,
+        padding: 20,
+        borderRadius: 5,
     }
 })
 

@@ -9,7 +9,7 @@ import Table from '../components/Table'
 const TableScreen = ({navigation}) => {
     return (
         <Container>
-            <Table navigation={navigation}/>
+            <Table navigation={navigation}  />
         </Container>
     )
 }

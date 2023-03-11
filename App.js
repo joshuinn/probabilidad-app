@@ -4,8 +4,6 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { MaterialIcons } from "@expo/vector-icons";
 import Constants from 'expo-constants'
 
-import TouchScreen from "./src/screens/TouchScreen.js";
-import PinScreen from "./src/screens/PinScreen.js";
 import HomeScreen from "./src/screens/HomeScreen.js";
 import ChartScreen from './src/screens/ChartScreen'
 import { StatusBar } from "expo-status-bar";
@@ -41,7 +39,7 @@ export default function App() {
     },
     tabBarActiveTintColor: "#5750f0",
   })
-  const TabStackScreen = () => {
+  /*const TabStackScreen = () => {
     return (
       <TabStack.Navigator screenOptions={screenOptions}>
         <TabStack.Screen name="Home" component={HomeScreen} />
@@ -49,22 +47,27 @@ export default function App() {
         <TabStack.Screen name="Charts" component={ChartScreen} options={{ title: "Gráficas" }} />
       </TabStack.Navigator>
     )
-  }
+  }*/
 
   return (
     <>
       <NavigationContainer>
+        <TabStack.Navigator screenOptions={screenOptions}>
+          <TabStack.Screen name="Home" component={HomeScreen} />
+          <TabStack.Screen name="Tables" component={Table} options={{ title: "Tabla" }} />
+          <TabStack.Screen name="Charts" component={ChartScreen} options={{ title: "Gráficas" }} />
+        </TabStack.Navigator>
+      </NavigationContainer>
+      <StatusBar style="light" />
+    </>
+  )
+}
+/*
         <AppStack.Navigator headerShown={false} screenOptions={{
           headerShown: false,
           cardStyle: {
           }
         }} >
           <AppStack.Screen name="Tabs" component={TabStackScreen} />
-          <AppStack.Screen name="Touch" component={TouchScreen} />
-          <AppStack.Screen name="Pin" component={PinScreen} />
         </AppStack.Navigator>
-      </NavigationContainer>
-      <StatusBar style="light" />
-    </>
-  )
-}
+        */
